@@ -19,7 +19,7 @@ public class HelloController {
     @GetMapping("/hello")
     public String hello() {
         String str = helloService.getString();
-
+        // pull request test용 더미주석
         return str;
     }
 }
