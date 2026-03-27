@@ -7,13 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController  // 웹 요청을 처리하는 컨트롤러
 public class HelloController {
-    @Autowired // 생성자 자동 넣어줌
-    private HelloService helloService;
+
+
+    private final HelloService helloService;
 
     // 생성자 직접 작성 - Spring이 HelloService를 자동으로 넣어줌
-//    public HelloController(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
+    @Autowired
+    public HelloController(HelloService helloService) {
+        this.helloService = helloService;
+    }
 
     @GetMapping("/hello")
     public String hello() {
