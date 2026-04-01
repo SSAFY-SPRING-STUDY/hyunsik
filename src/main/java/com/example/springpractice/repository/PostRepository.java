@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /*
 레포,서비스, 컨트롤러가 아닌 애들은
@@ -23,13 +24,13 @@ public class PostRepository {
       return postList;
     }
 
-    public PostEntity findById(Long id) {
+    public Optional<PostEntity> findById(Long id) {
         for (PostEntity entity : postList) {
             if (entity.getId() == id) {
-                return entity;
+                return Optional.of(entity);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public void deleteById(Long id) {
