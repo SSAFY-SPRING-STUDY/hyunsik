@@ -1,4 +1,4 @@
-package com.example.springpractice.entity;
+package com.example.springpractice.domain.post.controller.entity;
 
 import lombok.Getter;
 
