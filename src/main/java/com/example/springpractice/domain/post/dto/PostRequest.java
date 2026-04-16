@@ -1,4 +1,4 @@
-package com.example.springpractice.controller.dto;
+package com.example.springpractice.domain.post.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

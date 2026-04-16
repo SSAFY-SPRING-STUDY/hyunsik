@@ -1,4 +1,4 @@
-package com.example.springpractice;
+package com.example.springpractice.domain.post;
 
 public class CreatePostRequest {
     public String title;
