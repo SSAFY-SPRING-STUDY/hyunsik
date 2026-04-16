@@ -4,6 +4,7 @@ package com.example.springpractice.domain.auth.service;
 import com.example.springpractice.domain.auth.component.SessionManager;
 import com.example.springpractice.domain.auth.controller.dto.LoginRequest;
 import com.example.springpractice.domain.auth.controller.dto.LoginResponse;
+import com.example.springpractice.domain.auth.util.AuthorizationUtils;
 import com.example.springpractice.domain.member.entity.MemberEntity;
 import com.example.springpractice.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class AuthService {
 
         if(member.isValidPassword(request.password())){
             String token = sessionManager.createSession(member.getId());
-            return new LoginResponse(token, "Bearer");
+            return new LoginResponse(token, AuthorizationUtils.BEARER_PREFIX.strip());
             // BEARER 가 뭐지 -> 토큰 타입 근데 이거 소문자로 써야한다함 대문자 x
 
         }
