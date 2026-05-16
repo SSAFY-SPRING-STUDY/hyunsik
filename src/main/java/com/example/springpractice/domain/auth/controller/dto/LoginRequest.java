@@ -1,8 +1,5 @@
 package com.example.springpractice.domain.auth.controller.dto;
 
-public record LoginRequest(
-        // 레코드는 아직 잘 모르겟음 최신문법이라던데
-        String loginId,
-        String password
-) {
+// loginId 대신 username 으로 통일 - MemberEntity 필드명이랑 맞춰줌
+public record LoginRequest(String username, String password) {
 }

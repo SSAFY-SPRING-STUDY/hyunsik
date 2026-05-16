@@ -1,14 +1,14 @@
 package com.example.springpractice.domain.auth.service;
 
-
 import com.example.springpractice.domain.auth.component.SessionManager;
 import com.example.springpractice.domain.auth.controller.dto.LoginRequest;
 import com.example.springpractice.domain.auth.controller.dto.LoginResponse;
-import com.example.springpractice.domain.auth.util.AuthorizationUtils;
 import com.example.springpractice.domain.member.entity.MemberEntity;
 import com.example.springpractice.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -17,26 +17,22 @@ public class AuthService {
     private final SessionManager sessionManager;
     private final MemberRepository memberRepository;
 
-    // loginrequest 받아올떄 아이디 패스워드 받잔슴?
-    // MemberEntity 에 저장된 거 조회, 올바르면 로그인!
-    // 근데 멤버에 있으니까 로그인된 상태를 저장해서 token 형태로 확인함.
-
     public LoginResponse login(LoginRequest request) {
-        MemberEntity member = memberRepository.findbyLoginId(request.loginId())
-                .orElseThrow(() -> new RuntimeException("아이디가 올바르지 않습니다."));
+        // username 으로 회원 조회 - 없으면 RuntimeException 대신 바로 401 던짐
+        // try-catch 로 잡지 않아도 Spring 이 알아서 401 응답으로 만들어줌
+        MemberEntity member = memberRepository.findByUsername(request.username())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디가 올바르지 않습니다."));
 
-        if(member.isValidPassword(request.password())){
-            String token = sessionManager.createSession(member.getId());
-            return new LoginResponse(token, AuthorizationUtils.BEARER_PREFIX.strip());
-            // BEARER 가 뭐지 -> 토큰 타입 근데 이거 소문자로 써야한다함 대문자 x
-
+        // 비밀번호 틀려도 401 - 아이디 없는 경우와 같은 상태코드로 처리해서 어떤 게 틀렸는지 외부에 노출 안 함
+        if (!member.checkPassword(request.password())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 올바르지 않습니다.");
         }
-        throw new RuntimeException("비밀번호가 올바르지 않습니다.");
 
-
+        String sessionKey = sessionManager.createSession(member.getId());
+        return LoginResponse.from(sessionKey);
     }
 
-    public void logout(String accessToken) {
-        sessionManager.removeSession(accessToken);
+    public void logout(String sessionKey) {
+        sessionManager.removeSession(sessionKey);
     }
 }
