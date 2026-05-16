@@ -3,11 +3,12 @@ package com.example.springpractice.domain.auth.controller;
 import com.example.springpractice.domain.auth.controller.dto.LoginRequest;
 import com.example.springpractice.domain.auth.controller.dto.LoginResponse;
 import com.example.springpractice.domain.auth.service.AuthService;
-import com.example.springpractice.domain.auth.util.AuthorizationUtils;
+import com.example.springpractice.domain.auth.util.AuthTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,26 +17,24 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // try-catch로 RuntimeException을 잡아 로그인 실패 시 401 반환
-    // 예외처리를 상태코드로 처리하기 -> 트라이캐치문 복습
+    // 로그인 실패 시 AuthService 에서 ResponseStatusException(401) 을 던지므로
+    // 이전처럼 try-catch 로 잡을 필요 없이 Spring 이 알아서 401 로 내려줌
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-
-        LoginResponse response = null;
-        try {
-            response = authService.login(request);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
-    // @RequestHeader: HTTP 요청 헤더 값을 파라미터로 받는 어노테이션 -> 어노테이션 노트 만들어야함
+    // @RequestHeader - HTTP 요청 헤더 값을 파라미터로 받는 어노테이션
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
-        String accessToken = AuthorizationUtils.getAccessToken(authHeader);
-        authService.logout(accessToken);
-        // 204 No Content: 성공했지만 응답 바디가 없을 때 사용
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String bearerToken) {
+        // 토큰 형식 잘못됐으면 로그아웃도 막아줌
+        if (AuthTokenUtils.isValidBearerToken(bearerToken)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰 형식입니다.");
+        }
+        String sessionKey = AuthTokenUtils.parseBearerToken(bearerToken);
+        authService.logout(sessionKey);
+        // 204 No Content - 성공했지만 응답 바디가 없을 때 사용
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
