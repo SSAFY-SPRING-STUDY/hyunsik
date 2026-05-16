@@ -4,10 +4,10 @@ import com.example.springpractice.domain.member.controller.dto.MemberRequest;
 import com.example.springpractice.domain.member.controller.dto.MemberResponse;
 import com.example.springpractice.domain.member.entity.MemberEntity;
 import com.example.springpractice.domain.member.repository.MemberRepository;
+import com.example.springpractice.global.exception.CustomException;
+import com.example.springpractice.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +21,10 @@ public class MemberService {
         return MemberResponse.from(savedEntity);
     }
 
-    // id 로 회원 못 찾으면 404 - RuntimeException 대신 ResponseStatusException 으로 HTTP 상태코드 직접 지정
+    // id 로 회원 못 찾으면 404 - CustomException으로 ErrorCode에 맞는 응답을 내려준다
     public MemberResponse getMemberInfo(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return MemberResponse.from(entity);
     }
 }
