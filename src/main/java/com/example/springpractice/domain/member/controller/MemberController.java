@@ -5,11 +5,12 @@ import com.example.springpractice.domain.auth.util.AuthTokenUtils;
 import com.example.springpractice.domain.member.controller.dto.MemberRequest;
 import com.example.springpractice.domain.member.controller.dto.MemberResponse;
 import com.example.springpractice.domain.member.service.MemberService;
+import com.example.springpractice.global.exception.CustomException;
+import com.example.springpractice.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,10 +27,11 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<MemberResponse> getMyInfo(
+            @RequestHeader(value = "Authorization", required = false) String bearerToken) {
         // 토큰 형식 먼저 검사 - null 이거나 "Bearer " 로 시작 안 하면 바로 401
         if (AuthTokenUtils.isValidBearerToken(bearerToken)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰 형식입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
         // "Bearer " 잘라내고 세션키 추출 -> 세션키로 회원 id 조회 -> 회원 정보 반환
         String sessionKey = AuthTokenUtils.parseBearerToken(bearerToken);

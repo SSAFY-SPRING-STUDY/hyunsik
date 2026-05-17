@@ -1,8 +1,8 @@
 package com.example.springpractice.domain.auth.component;
 
-import org.springframework.http.HttpStatus;
+import com.example.springpractice.global.exception.CustomException;
+import com.example.springpractice.global.exception.error.ErrorCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class SessionManager {
     public Long getMemberId(String sessionKey) {
         Long memberId = sessionStore.get(sessionKey);
         if (memberId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "세션이 유효하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
         return memberId;
     }

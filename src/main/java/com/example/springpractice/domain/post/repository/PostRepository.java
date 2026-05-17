@@ -1,6 +1,6 @@
 package com.example.springpractice.domain.post.repository;
 
-import com.example.springpractice.domain.post.controller.entity.PostEntity;
+import com.example.springpractice.domain.post.entity.PostEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class PostRepository {
 
     public Optional<PostEntity> findById(Long id) {
         for (PostEntity entity : postList) {
-            if (entity.getId() == id) {
+            if (entity.getId().equals(id)) {
                 return Optional.of(entity);
             }
         }
@@ -34,11 +34,6 @@ public class PostRepository {
     }
 
     public void deleteById(Long id) {
-        for (PostEntity entity : postList) {
-            if (entity.getId() == id) {
-                postList.remove(entity);
-                break;
-            }
-        }
+        postList.removeIf(entity -> entity.getId().equals(id));
     }
 }

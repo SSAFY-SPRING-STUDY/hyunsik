@@ -3,7 +3,10 @@ package com.example.springpractice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.example.springpractice.domain",
+        "com.example.springpractice.global"
+})
 public class SpringPracticeApplication {
 
     public static void main(String[] args) {
